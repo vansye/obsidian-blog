@@ -1,0 +1,14 @@
+{
+  "plate": "LAB-0001",
+  "slug": "table-example",
+  "section": "LAB",
+  "title": "发布路径速查",
+  "description": "窄屏下表格也要完整可读。",
+  "bodyHtml": "<table>\n<thead><tr><th>内容</th><th>目录</th><th>路由</th></tr></thead>\n<tbody><tr><td>文章</td><td>博客/文章/</td><td>/archive</td></tr><tr><td>随笔</td><td>博客/随笔/</td><td>/notes</td></tr></tbody>\n</table>\n",
+  "date": "2026-09-28",
+  "updated": "2026-09-28",
+  "wordCount": 45,
+  "readMinutes": 1,
+  "tags": ["排版"],
+  "canonicalPath": "/p/table-example"
+}

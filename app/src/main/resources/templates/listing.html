@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${pageTitle})}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main id="main" class="shell" tabindex="-1">
+  <header class="page-heading">
+    <p class="eyebrow" th:text="${total + ' 篇记录'}">0 篇记录</p>
+    <h1 th:text="${heading}">归档</h1>
+    <p th:text="${pageDescription}">按时间收录的文章。</p>
+  </header>
+  <section aria-label="文章列表">
+    <h2 class="visually-hidden" th:text="${heading + '列表'}">文章列表</h2>
+    <div th:replace="~{fragments :: posts(${items})}"></div>
+    <div class="empty-state" th:if="${#lists.isEmpty(items)}">
+      <p th:text="${page.page == 0 ? '这里还没有公开的内容。' : '这一页没有更多内容了。'}">这里还没有公开的内容。</p>
+      <a th:if="${page.page > 0}" th:href="@{${listingPath}}">回到第一页</a>
+    </div>
+  </section>
+  <nav th:replace="~{fragments :: pagination}"></nav>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

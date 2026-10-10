@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "plate": "ARCHIVE-0001",
+      "slug": "start-with-a-note",
+      "section": "ARCHIVE",
+      "title": "从一篇笔记开始",
+      "description": "把写作留在熟悉的地方，让发布成为一个轻轻的动作。",
+      "date": "2026-09-18",
+      "wordCount": 180,
+      "readMinutes": 1,
+      "tags": ["写作", "Obsidian"],
+      "canonicalPath": "/p/start-with-a-note"
+    }
+  ],
+  "total": 1,
+  "page": 0,
+  "size": 20
+}

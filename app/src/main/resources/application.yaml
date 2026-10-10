@@ -1,0 +1,60 @@
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+spring:
+  application:
+    name: obsidian-blog-starter
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC}
+    username: ${DB_USER:blog}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+  flyway:
+    enabled: true
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+blog:
+  site:
+    name: ${SITE_NAME:我的博客}
+    description: ${SITE_DESCRIPTION:记录学习、生活与创造。}
+    author: ${SITE_AUTHOR:作者}
+    url: ${SITE_URL:http://localhost:8080}
+    github: ${SITE_GITHUB:}
+    email: ${SITE_EMAIL:}
+  cors-origins: ${CORS_ORIGINS:}
+  vault:
+    dir: ${VAULT_DIR:./data/vault}
+    revision: HEAD
+    publish-root: ${PUBLISH_ROOT:博客}
+  sync:
+    startup-enabled: ${SYNC_STARTUP_ENABLED:true}
+    poll-enabled: ${SYNC_POLL_ENABLED:true}
+    poll-interval: ${SYNC_POLL_INTERVAL:PT10M}
+    poll-initial-delay: ${SYNC_POLL_INITIAL_DELAY:PT10M}
+    fetch-enabled: ${SYNC_FETCH_ENABLED:false}
+    fetch-timeout: ${SYNC_FETCH_TIMEOUT:PT60S}
+    webhook-secret: ${VAULT_WEBHOOK_SECRET:}
+    lock-ttl: ${SYNC_LOCK_TTL:PT10M}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+  health:
+    diskspace:
+      enabled: false
+    ssl:
+      enabled: false

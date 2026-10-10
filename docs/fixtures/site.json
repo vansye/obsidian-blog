@@ -1,0 +1,15 @@
+{
+  "name": "纸间",
+  "description": "用 Obsidian 写作，让想法自然生长。",
+  "author": "写作者",
+  "url": "http://localhost:8080",
+  "github": "",
+  "email": "",
+  "navigation": [
+    { "label": "首页", "path": "/" },
+    { "label": "归档", "path": "/archive" },
+    { "label": "随笔", "path": "/notes" },
+    { "label": "项目", "path": "/lab" },
+    { "label": "关于", "path": "/about" }
+  ]
+}

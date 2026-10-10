@@ -1,0 +1,25 @@
+# Explicitly opt in: docker compose -f compose.yaml -f compose.production.yaml up --build -d --wait
+services:
+  app:
+    environment:
+      SYNC_FETCH_ENABLED: "true"
+      GIT_SSH_COMMAND: ssh -i /run/secrets/vault_key -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/run/secrets/vault_known_hosts
+    volumes:
+      - type: bind
+        source: ./data/vault
+        target: /vault
+        read_only: false
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./secrets/vault_key
+        target: /run/secrets/vault_key
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./secrets/vault_known_hosts
+        target: /run/secrets/vault_known_hosts
+        read_only: true
+        bind:
+          create_host_path: false

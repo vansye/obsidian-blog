@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${pageTitle})}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main id="main" class="shell" tabindex="-1">
+  <section class="intro" aria-labelledby="home-title">
+    <p class="eyebrow">文字 · 想法 · 记录</p>
+    <h1 id="home-title" th:text="${site.name}">My Blog</h1>
+    <p class="intro-description" th:text="${site.description}">记录想法、日常与正在做的事。</p>
+    <a class="text-link" th:href="@{/about}">认识作者 <span aria-hidden="true">↗</span></a>
+  </section>
+  <section class="latest" aria-labelledby="latest-title">
+    <div class="section-heading">
+      <h2 id="latest-title">最近更新</h2>
+      <a class="text-link" th:href="@{/archive}">全部文章 <span th:text="${total}">0</span> <span aria-hidden="true">→</span></a>
+    </div>
+    <div th:replace="~{fragments :: posts(${items})}"></div>
+    <p class="empty-state" th:if="${#lists.isEmpty(items)}">这里还很安静，新的文章正在路上。</p>
+  </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

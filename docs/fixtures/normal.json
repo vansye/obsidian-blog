@@ -1,0 +1,14 @@
+{
+  "plate": "ARCHIVE-0001",
+  "slug": "start-with-a-note",
+  "section": "ARCHIVE",
+  "title": "从一篇笔记开始",
+  "description": "把写作留在熟悉的地方，让发布成为一个轻轻的动作。",
+  "bodyHtml": "<p>写作最舒服的时刻，是工具退到身后，只剩下眼前的一段话。</p>\n<h2>写下，再决定公开</h2>\n<p>笔记仍然是你自己的 Markdown 文件。</p>\n<blockquote><p>为值得分享的想法开一扇窗。</p></blockquote>\n",
+  "date": "2026-09-18",
+  "updated": "2026-10-01",
+  "wordCount": 180,
+  "readMinutes": 1,
+  "tags": ["写作", "Obsidian"],
+  "canonicalPath": "/p/start-with-a-note"
+}

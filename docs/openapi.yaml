@@ -1,0 +1,285 @@
+openapi: 3.0.3
+info:
+  title: Obsidian Blog Starter public API
+  version: 1.0.0
+  description: |
+    Public committed content only. No authentication on read APIs. Unpublished and missing content both return 404.
+    JSON and attachments use Cache-Control: no-cache and ETag. Revalidate before reuse; 304 has no body.
+    The single-instance sync webhook is separate from the public read API and never enabled for CORS.
+servers:
+  - url: /
+paths:
+  /api/v1/site:
+    get:
+      operationId: getSite
+      responses:
+        '200':
+          description: Public site settings
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Site'}
+        '304': {$ref: '#/components/responses/NotModified'}
+  /api/v1/posts:
+    get:
+      operationId: listPosts
+      description: ARCHIVE, NOTES and LAB posts ordered by date descending, then stable internal sequence descending.
+      parameters:
+        - {$ref: '#/components/parameters/Page'}
+        - {$ref: '#/components/parameters/Size'}
+      responses:
+        '200': {$ref: '#/components/responses/Page'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+  /api/v1/sections/{section}:
+    get:
+      operationId: listSection
+      parameters:
+        - name: section
+          in: path
+          required: true
+          description: Case-insensitive section code. Unknown codes return 404.
+          schema: {type: string, enum: [ARCHIVE, NOTES, LAB, ABOUT, LINKS]}
+        - {$ref: '#/components/parameters/Page'}
+        - {$ref: '#/components/parameters/Size'}
+      responses:
+        '200': {$ref: '#/components/responses/Page'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /api/v1/posts/{path}:
+    get:
+      operationId: getPost
+      parameters:
+        - {$ref: '#/components/parameters/PostPath'}
+      responses:
+        '200': {$ref: '#/components/responses/Detail'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /api/v1/posts/{path}/neighbors:
+    get:
+      operationId: getNeighbors
+      description: Neighbors in the same section, with the same ordering as lists. Either value can be null.
+      parameters:
+        - {$ref: '#/components/parameters/PostPath'}
+      responses:
+        '200':
+          description: Adjacent public posts
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Neighbors'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /api/v1/about:
+    get:
+      operationId: getAbout
+      responses:
+        '200': {$ref: '#/components/responses/Detail'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /api/v1/links:
+    get:
+      operationId: getLinks
+      responses:
+        '200': {$ref: '#/components/responses/Detail'}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /assets/{fileName}:
+    get:
+      operationId: getAsset
+      description: Only assets referenced by at least one currently published post are accessible. SVG/PDF have a restrictive Content-Security-Policy.
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          schema: {type: string, example: 7a55bdcba79c0efd.png}
+      responses:
+        '200':
+          description: Referenced asset bytes (maximum 20 MiB)
+          headers:
+            ETag: {$ref: '#/components/headers/ETag'}
+            Cache-Control: {$ref: '#/components/headers/CacheControl'}
+          content:
+            application/octet-stream:
+              schema: {type: string, format: binary}
+        '304': {$ref: '#/components/responses/NotModified'}
+        '404': {description: Asset unavailable; empty body.}
+  /api/sync/webhook:
+    post:
+      operationId: receiveGitHubWebhook
+      description: |
+        HMAC-SHA256 of exact request bytes. Empty server secret rejects all requests. Only push synchronizes;
+        ping returns pong and other signed events are ignored. GitHub deployments fetch under the sync lock.
+        Busy/partial outcomes converge via periodic full reconciliation. Response never includes internal commit IDs.
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema: {type: string, pattern: '^sha256=[0-9a-f]{64}$'}
+        - name: X-GitHub-Event
+          in: header
+          required: true
+          schema: {type: string, example: push}
+        - name: X-GitHub-Delivery
+          in: header
+          schema: {type: string, maxLength: 128, pattern: '^[A-Za-z0-9:._-]+$'}
+          description: Unique delivery identifier; omitted IDs are derived from SHA256 of the payload.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, additionalProperties: true}
+      responses:
+        '200':
+          description: synced, already handled, pong or ignored
+          content: {text/plain: {schema: {type: string}}}
+        '202': {description: Busy or partial; scheduled reconciliation will retry.}
+        '400': {description: Invalid delivery ID.}
+        '401': {description: Missing or invalid signature, or server secret not configured.}
+        '500': {description: Fetch or synchronization failed; see private application logs.}
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Zero-based. page * size must not exceed 1000000; larger or negative values return 400.
+      schema: {type: integer, minimum: 0, default: 0}
+    Size:
+      name: size
+      in: query
+      schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+    PostPath:
+      name: path
+      in: path
+      required: true
+      description: One URL segment containing a slug or stable generated plate such as A-001. Use canonicalPath for frontend links.
+      schema: {type: string, example: welcome}
+  headers:
+    ETag:
+      description: Opaque entity tag for If-None-Match revalidation.
+      schema: {type: string}
+    CacheControl:
+      schema: {type: string, example: no-cache}
+  responses:
+    NotModified:
+      description: Cached representation remains current; no response body.
+    NotFound:
+      description: Content does not exist or is not public.
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problem'}
+          example: {type: 'about:blank', title: Not Found, status: 404, detail: The requested content is unavailable., code: NOT_FOUND}
+    BadRequest:
+      description: Invalid input parameters.
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/Problem'}
+          example: {type: 'about:blank', title: Bad Request, status: 400, detail: 'Check page, size and path parameters.', code: INVALID_ARGUMENT}
+    Page:
+      description: Paginated public summaries; out-of-range valid pages contain an empty items list.
+      headers:
+        ETag: {$ref: '#/components/headers/ETag'}
+        Cache-Control: {$ref: '#/components/headers/CacheControl'}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Page'}
+    Detail:
+      description: Public rendered article
+      headers:
+        ETag: {$ref: '#/components/headers/ETag'}
+        Cache-Control: {$ref: '#/components/headers/CacheControl'}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/PostDetail'}
+  schemas:
+    Site:
+      type: object
+      additionalProperties: false
+      required: [name, description, author, url, github, email, navigation]
+      properties:
+        name: {type: string}
+        description: {type: string}
+        author: {type: string}
+        url: {type: string, format: uri}
+        github: {type: string, description: Optional external link; empty when unset.}
+        email: {type: string, description: Optional email; empty when unset.}
+        navigation:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [label, path]
+            properties:
+              label: {type: string}
+              path: {type: string}
+    PostSummary:
+      type: object
+      additionalProperties: false
+      required: [plate, slug, section, title, description, date, wordCount, readMinutes, tags, canonicalPath]
+      properties:
+        plate: {type: string, example: A-001}
+        slug: {type: string, nullable: true}
+        section: {type: string, enum: [ARCHIVE, NOTES, LAB, ABOUT, LINKS]}
+        title: {type: string}
+        description: {type: string, nullable: true}
+        date: {type: string, format: date, nullable: true}
+        wordCount: {type: integer, minimum: 0}
+        readMinutes: {type: integer, minimum: 0}
+        tags: {type: array, items: {type: string}}
+        canonicalPath: {type: string, example: /p/welcome}
+    PostDetail:
+      type: object
+      additionalProperties: false
+      required: [plate, slug, section, title, description, date, wordCount, readMinutes, tags, canonicalPath, bodyHtml, updated]
+      properties:
+        plate: {$ref: '#/components/schemas/PostSummary/properties/plate'}
+        slug: {$ref: '#/components/schemas/PostSummary/properties/slug'}
+        section: {$ref: '#/components/schemas/PostSummary/properties/section'}
+        title: {$ref: '#/components/schemas/PostSummary/properties/title'}
+        description: {$ref: '#/components/schemas/PostSummary/properties/description'}
+        date: {$ref: '#/components/schemas/PostSummary/properties/date'}
+        wordCount: {$ref: '#/components/schemas/PostSummary/properties/wordCount'}
+        readMinutes: {$ref: '#/components/schemas/PostSummary/properties/readMinutes'}
+        tags: {$ref: '#/components/schemas/PostSummary/properties/tags'}
+        canonicalPath: {$ref: '#/components/schemas/PostSummary/properties/canonicalPath'}
+        bodyHtml:
+          type: string
+          description: Server-rendered HTML. Raw author HTML is escaped. Local images use /assets URLs; resolve against backend origin when frontend uses another origin.
+        updated: {type: string, format: date, nullable: true}
+    Page:
+      type: object
+      additionalProperties: false
+      required: [items, total, page, size]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/PostSummary'}}
+        total: {type: integer, minimum: 0}
+        page: {type: integer, minimum: 0}
+        size: {type: integer, minimum: 1, maximum: 100}
+    Neighbors:
+      type: object
+      additionalProperties: false
+      required: [newer, older]
+      properties:
+        newer:
+          type: object
+          nullable: true
+          allOf: [{$ref: '#/components/schemas/PostSummary'}]
+        older:
+          type: object
+          nullable: true
+          allOf: [{$ref: '#/components/schemas/PostSummary'}]
+    Problem:
+      type: object
+      required: [type, title, status, detail, code]
+      properties:
+        type: {type: string, example: 'about:blank'}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        instance: {type: string}
+        code: {type: string, enum: [INVALID_ARGUMENT, NOT_FOUND, REQUEST_FAILED, FORBIDDEN]}

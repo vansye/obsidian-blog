@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title == site.name ? title : title + ' · ' + site.name}">My Blog</title>
+  <meta name="description" th:content="${pageDescription}">
+  <meta name="author" th:content="${site.author}">
+  <link rel="canonical" th:href="${canonicalUrl}">
+  <meta property="og:title" th:content="${title}">
+  <meta property="og:description" th:content="${pageDescription}">
+  <meta property="og:url" th:content="${canonicalUrl}">
+  <meta property="og:site_name" th:content="${site.name}">
+  <link rel="stylesheet" th:href="@{/css/site.css}">
+</head>
+<body>
+<header class="site-header shell" th:fragment="header">
+  <a class="skip-link" href="#main">跳到正文</a>
+  <a class="site-name" th:href="@{/}" th:text="${site.name}">My Blog</a>
+  <nav class="site-nav" aria-label="主导航">
+    <a th:each="item : ${site.navigation}" th:href="@{${item.path}}" th:text="${item.label}"
+       th:attr="aria-current=${activePath == item.path ? 'page' : null}">首页</a>
+  </nav>
+</header>
+
+<div th:fragment="posts(items)" class="post-list">
+  <article class="post-row" th:each="item : ${items}">
+    <div class="post-date"><time th:if="${item.date != null}" th:datetime="${item.date}"
+          th:text="${#temporals.format(item.date, 'yyyy-MM-dd')}">2026-01-01</time></div>
+    <div class="post-preview">
+      <h3><a th:href="@{${item.canonicalPath}}"
+             th:text="${#strings.isEmpty(item.title) ? '未命名文章' : item.title}">文章标题</a></h3>
+      <p th:if="${!#strings.isEmpty(item.description)}" th:text="${item.description}">文章摘要。</p>
+      <ul class="tags" aria-label="标签" th:if="${!#lists.isEmpty(item.tags)}">
+        <li th:each="tag : ${item.tags}" th:text="${tag}">标签</li>
+      </ul>
+    </div>
+  </article>
+</div>
+
+<nav th:fragment="pagination" class="pagination" aria-label="分页"
+     th:if="${hasPrevious or hasNext}">
+  <a th:if="${hasPrevious}" rel="prev" th:href="@{${listingPath}(page=${previousPage})}">← 上一页</a>
+  <span th:unless="${hasPrevious}" aria-hidden="true"></span>
+  <span class="page-count" th:text="${pageNumber + ' / ' + totalPages}">1 / 2</span>
+  <a th:if="${hasNext}" rel="next" th:href="@{${listingPath}(page=${nextPage})}">下一页 →</a>
+  <span th:unless="${hasNext}" aria-hidden="true"></span>
+</nav>
+
+<footer class="site-footer shell" th:fragment="footer">
+  <span>© <span th:text="${site.author}">作者</span></span>
+  <div class="footer-links">
+    <a th:if="${!#strings.isEmpty(site.github)}" th:href="${site.github}" rel="me">GitHub</a>
+    <a th:if="${!#strings.isEmpty(site.email)}" th:href="${'mailto:' + site.email}">邮件</a>
+    <a href="#main">回到正文 ↑</a>
+  </div>
+</footer>
+</body>
+</html>

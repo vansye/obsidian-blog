@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('页面未找到')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main id="main" class="shell not-found" tabindex="-1">
+  <p class="eyebrow">404</p>
+  <h1>这一页，暂时留白。</h1>
+  <p>页面不存在，或已不再公开。去其他地方看看吧。</p>
+  <a class="text-link" th:href="@{/}">← 回到首页</a>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "plate": "ARCHIVE-0002",
+  "slug": "images-and-space",
+  "section": "ARCHIVE",
+  "title": "图像与留白",
+  "description": "一张插图，也是一口呼吸。",
+  "bodyHtml": "<p>一页文字里，图片可以是一口呼吸。</p>\n<p><img src=\"/assets/0123456789abcdef.svg\" alt=\"山间日落的几何插图\" /></p>\n",
+  "date": "2026-09-23",
+  "updated": "2026-09-23",
+  "wordCount": 62,
+  "readMinutes": 1,
+  "tags": ["图像"],
+  "canonicalPath": "/p/images-and-space"
+}

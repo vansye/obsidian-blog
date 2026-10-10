@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${pageTitle})}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main id="main" class="shell reading" tabindex="-1">
+  <article>
+    <header class="article-heading">
+      <a class="text-link" th:href="@{${sectionPath}}" th:text="${'← ' + sectionLabel}">← 归档</a>
+      <h1 th:text="${pageTitle}">文章标题</h1>
+      <p class="article-description" th:if="${!#strings.isEmpty(post.description)}" th:text="${post.description}">文章摘要。</p>
+      <div class="article-meta">
+        <span th:text="${site.author}">作者</span>
+        <time th:if="${post.date != null}" th:datetime="${post.date}" th:text="${post.date}">2026-01-01</time>
+        <span th:if="${post.readMinutes > 0}" th:text="${post.readMinutes + ' 分钟阅读'}">3 分钟阅读</span>
+        <span th:if="${post.updated != null and post.updated != post.date}">更新于 <time th:datetime="${post.updated}" th:text="${post.updated}">2026-01-02</time></span>
+      </div>
+    </header>
+    <div class="prose" th:utext="${post.bodyHtml}"><p>文章正文。</p></div>
+    <ul class="tags article-tags" aria-label="标签" th:if="${!#lists.isEmpty(post.tags)}">
+      <li th:each="tag : ${post.tags}" th:text="${tag}">标签</li>
+    </ul>
+  </article>
+  <nav class="post-neighbors" aria-label="相邻文章" th:if="${neighbors.newer != null or neighbors.older != null}">
+    <a th:if="${neighbors.newer != null}" th:href="@{${neighbors.newer.canonicalPath}}">
+      <span>← 更新的文章</span>
+      <strong th:text="${#strings.isEmpty(neighbors.newer.title) ? '未命名文章' : neighbors.newer.title}">文章标题</strong>
+    </a>
+    <span th:unless="${neighbors.newer != null}"></span>
+    <a th:if="${neighbors.older != null}" th:href="@{${neighbors.older.canonicalPath}}">
+      <span>更早的文章 →</span>
+      <strong th:text="${#strings.isEmpty(neighbors.older.title) ? '未命名文章' : neighbors.older.title}">文章标题</strong>
+    </a>
+  </nav>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

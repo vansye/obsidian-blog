@@ -1,0 +1,29 @@
+:root { --background: #faf9f6; --text: #292d28; --muted: #666b62; --accent: #3d6247; --border: #dddfd7; }
+* { box-sizing: border-box; }
+body { margin: 0 auto; width: min(54rem, calc(100% - 2.5rem)); background: var(--background); color: var(--text); font: 1rem/1.85 system-ui, sans-serif; overflow-wrap: anywhere; }
+a { color: inherit; text-underline-offset: .25em; }
+a:hover { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+button { margin-left: 1rem; border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 4px; padding: .4rem 1rem; font: inherit; cursor: pointer; }
+header, nav { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center; }
+header { justify-content: space-between; border-bottom: 1px solid var(--border); padding: 1.75rem 0; }
+header > a { font-weight: 650; text-decoration: none; }
+nav { font-size: .875rem; }
+[aria-current] { color: var(--accent); font-weight: 650; }
+main { min-height: 65vh; padding-top: 3rem; }
+main:focus { outline: none; }
+h1 { font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1.35; letter-spacing: -.04em; }
+h2 { line-height: 1.45; font-size: 1.4rem; }
+article { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+time, small, footer { color: var(--muted); }
+main > nav { margin-top: 2rem; justify-content: space-between; }
+.prose { margin-top: 2rem; }
+.prose img { display: block; max-width: 100%; height: auto; }
+.prose pre { overflow-x: auto; padding: 1.25rem; background: #eeede7; }
+.prose code { font-size: .9em; }
+.prose blockquote { margin-left: 0; border-left: 3px solid var(--border); padding-left: 1.5rem; color: var(--muted); }
+.prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.prose th, .prose td { border: 1px solid var(--border); padding: .5rem 1rem; }
+footer { padding: 3rem 0; margin-top: 3rem; font-size: .8rem; }
+.skip { position: absolute; top: -5rem; background: var(--background); }
+.skip:focus { top: .5rem; }

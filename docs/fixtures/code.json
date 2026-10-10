@@ -1,0 +1,14 @@
+{
+  "plate": "ARCHIVE-0003",
+  "slug": "code-example",
+  "section": "ARCHIVE",
+  "title": "一小段代码",
+  "description": "检查缩进、转义与横向滚动。",
+  "bodyHtml": "<pre><code class=\"language-javascript\">function greeting(name) {\n  return `你好，${name}`;\n}\nconsole.log(greeting('&lt;读者&gt;'));\n</code></pre>\n",
+  "date": "2026-09-27",
+  "updated": "2026-09-27",
+  "wordCount": 48,
+  "readMinutes": 1,
+  "tags": ["代码"],
+  "canonicalPath": "/p/code-example"
+}

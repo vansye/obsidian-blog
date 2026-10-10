@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640">
+  <title>山间日落的几何插图</title>
+  <rect width="1200" height="640" fill="#f2ebe0"/>
+  <circle cx="830" cy="214" r="100" fill="#c88054"/>
+  <path d="M0 455 290 195 690 640H0Z" fill="#859589"/>
+  <path d="m250 640 380-335 400 335Z" fill="#526a63"/>
+  <path d="m655 640 312-247 233 148v99Z" fill="#b8baa4"/>
+  <path d="M0 589q290-102 580 0t620-8v59H0Z" fill="#d9c7a9"/>
+</svg>

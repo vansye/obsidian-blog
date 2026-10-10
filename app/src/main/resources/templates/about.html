@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${pageTitle})}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main id="main" class="shell reading" tabindex="-1">
+  <header class="page-heading">
+    <p class="eyebrow" th:text="${site.author}">作者</p>
+    <h1>关于</h1>
+  </header>
+  <div class="prose" th:if="${about != null}" th:utext="${about.bodyHtml}"><p>关于作者。</p></div>
+  <p class="about-intro" th:if="${about == null}" th:text="${site.description}">记录想法、日常与正在做的事。</p>
+  <section class="about-links" th:if="${links != null}" aria-labelledby="links-title">
+    <h2 id="links-title">朋友与链接</h2>
+    <div class="prose" th:utext="${links.bodyHtml}"><p>值得访问的地方。</p></div>
+  </section>
+  <aside class="contact" aria-label="联系作者" th:if="${!#strings.isEmpty(site.github) or !#strings.isEmpty(site.email)}">
+    <h2>保持联系</h2>
+    <a th:if="${!#strings.isEmpty(site.github)}" th:href="${site.github}" rel="me">GitHub ↗</a>
+    <a th:if="${!#strings.isEmpty(site.email)}" th:href="${'mailto:' + site.email}">发一封邮件 ↗</a>
+  </aside>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

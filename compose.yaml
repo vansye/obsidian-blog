@@ -1,0 +1,79 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:${PORT:-8080}:8080"
+    environment:
+      PORT: 8080
+      DB_URL: jdbc:mysql://mysql:3306/blog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+      DB_USER: blog
+      DB_PASSWORD: ${DB_PASSWORD:?Run scripts/setup-demo first}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      VAULT_DIR: /vault
+      PUBLISH_ROOT: ${PUBLISH_ROOT:-博客}
+      SITE_NAME: ${SITE_NAME:-我的博客}
+      SITE_DESCRIPTION: ${SITE_DESCRIPTION:-记录学习、生活与创造。}
+      SITE_AUTHOR: ${SITE_AUTHOR:-作者}
+      SITE_URL: ${SITE_URL:-http://localhost:8080}
+      SITE_GITHUB: ${SITE_GITHUB:-}
+      SITE_EMAIL: ${SITE_EMAIL:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      SYNC_FETCH_ENABLED: ${SYNC_FETCH_ENABLED:-false}
+      SYNC_STARTUP_ENABLED: ${SYNC_STARTUP_ENABLED:-true}
+      SYNC_POLL_ENABLED: ${SYNC_POLL_ENABLED:-true}
+      SYNC_POLL_INTERVAL: ${SYNC_POLL_INTERVAL:-PT10M}
+      SYNC_POLL_INITIAL_DELAY: ${SYNC_POLL_INITIAL_DELAY:-PT10M}
+      VAULT_WEBHOOK_SECRET: ${VAULT_WEBHOOK_SECRET:-}
+    volumes:
+      - type: bind
+        source: ./data/vault
+        target: /vault
+        read_only: true
+        bind:
+          create_host_path: false
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --output, /dev/null, http://localhost:8080/actuator/health]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: blog
+      MYSQL_USER: blog
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Run scripts/setup-demo first}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Run scripts/setup-demo first}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [CMD-SHELL, 'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --user="$$MYSQL_USER" --database="$$MYSQL_DATABASE" --execute="SELECT 1" --silent >/dev/null']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command: [sh, -c, 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"']
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  mysql-data:
+  redis-data:
